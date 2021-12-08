@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id          String   @id @default(cuid())
+  firstName   String   @db.VarChar(16)
+  lasName     String   @db.VarChar(16)
+  middleName  String?  @db.VarChar(16)
+  gender      String   @db.Char
+  nationality String?  @db.VarChar(32)
+  address     Address?
+  dob         DateTime @db.Date
+  bloodGroup  String?  @db.Char(2)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @default(now()) @db.Timestamptz
+}
+
+model Doctor {
+  id             String            @id @default(cuid())
+  firstName      String            @db.VarChar(16)
+  lasName        String            @db.VarChar(16)
+  middleName     String?           @db.VarChar(16)
+  gender         String            @db.Char
+  address        Address?
+  schedule       Doctor_Schedule[]
+  specialization String            @db.VarChar(256)
+  createdAt      DateTime          @default(now()) @db.Timestamptz
+  updatedAt      DateTime          @default(now()) @db.Timestamptz
+  Hospital       Hospital?         @relation(fields: [hospitalId], references: [id])
+  hospitalId     String?
+}
+
+model Doctor_Schedule {
+  id        String   @id @default(cuid())
+  startDate DateTime @default(now()) @db.Timestamptz
+  endDate   DateTime @default(now()) @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @default(now()) @db.Timestamptz
+  Doctor    Doctor?  @relation(fields: [doctorId], references: [id])
+  doctorId  String?
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  email         String   @db.VarChar(256)
+  phone         String?  @db.VarChar(16)
+  mobile        String?  @db.VarChar(16)
+  office        String?  @db.VarChar(16)
+  region        String?  @db.VarChar(16)
+  city          String?  @db.VarChar(16)
+  town          String?  @db.VarChar(256)
+  postalAddress String?  @db.VarChar
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @default(now()) @db.Timestamptz
+  Patient       Patient? @relation(fields: [patientId], references: [id])
+  patientId     String?  @unique
+  Doctor        Doctor?  @relation(fields: [doctorId], references: [id])
+  doctorId      String?  @unique
+  Staff         Staff?   @relation(fields: [staffId], references: [id])
+  staffId       String?  @unique
+}
+
+model Hospital {
+  id           String        @id @default(cuid())
+  name         String        @db.VarChar(256)
+  doctors      Doctor[]
+  staffs       Staff[]
+  appointments Appointment[]
+  services     Service[]
+  createdAt    DateTime      @default(now()) @db.Timestamptz
+  updatedAt    DateTime      @default(now()) @db.Timestamptz
+}
+
+model Appointment {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+  updatedAt  DateTime  @default(now()) @db.Timestamptz
+  Hospital   Hospital? @relation(fields: [hospitalId], references: [id])
+  hospitalId String?
+}
+
+model Staff {
+  id          String    @id @default(cuid())
+  firstName   String    @db.VarChar(16)
+  lasName     String    @db.VarChar(16)
+  middleName  String?   @db.VarChar(16)
+  address     Address?
+  gender      String    @db.Char
+  designation String    @db.VarChar(32)
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @default(now()) @db.Timestamptz
+  Hospital    Hospital? @relation(fields: [hospitalId], references: [id])
+  hospitalId  String?
+}
+
+model Service {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+  updatedAt  DateTime  @default(now()) @db.Timestamptz
+  Hospital   Hospital? @relation(fields: [hospitalId], references: [id])
+  hospitalId String?
+}
+
+model Medicine {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @default(now()) @db.Timestamptz
+}
+
+model Treatment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @default(now()) @db.Timestamptz
+}
+
+model Treatment_Detail {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @default(now()) @db.Timestamptz
+}
