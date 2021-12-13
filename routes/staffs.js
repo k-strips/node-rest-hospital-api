@@ -17,7 +17,7 @@ staffRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const staffs = await prisma.staff.create(req.body);
+      const staffs = await prisma.staff.createMany(req.body);
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(staffs);
@@ -33,7 +33,7 @@ staffRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const staffs = await prisma.staff.remove({});
+      const staffs = await prisma.staff.deleteMany(req.body);
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(staffs);
@@ -44,7 +44,9 @@ staffRouter
   .route("/:staffId")
   .get(
     asyncHandler(async (req, res) => {
-      const staff = await Departments.findById(req.params.staffId);
+      const staff = await prisma.staff.findUnique({
+        where: { id: req.params.staffId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(staff);
@@ -60,11 +62,10 @@ staffRouter
 
   .put(
     asyncHandler(async (req, res) => {
-      const staff = await Departments.findByIdAndUpdate(
-        req.params.staffId,
-        { $set: req.body },
-        { new: true }
-      );
+      const staff = await prisma.staff.update({
+        where: { id: req.params.staffId },
+        data: req.body,
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(staff);
@@ -73,7 +74,9 @@ staffRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const staff = await Departments.findByIdAndRemove(req.params.staffId);
+      const staff = await prisma.staff.delete({
+        where: { id: req.params.staffId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(staff);

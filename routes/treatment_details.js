@@ -19,7 +19,9 @@ treatmentDetailsRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const treatment_details = await prisma.treatment_detail.create(req.body);
+      const treatment_details = await prisma.treatment_detail.createMany(
+        req.body
+      );
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(treatment_details);
@@ -35,7 +37,7 @@ treatmentDetailsRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const treatment_details = await prisma.treatment_detail.remove({});
+      const treatment_details = await prisma.treatment_detail.delete(req.body);
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(treatment_details);
@@ -46,9 +48,9 @@ treatmentDetailsRouter
   .route("/:treatment_detailId")
   .get(
     asyncHandler(async (req, res) => {
-      const treatment_detail = await Departments.findById(
-        req.params.treatment_detailId
-      );
+      const treatment_detail = await prisma.treatment_Detail.findUnique({
+        where: { id: req.params.treatment_detailId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(treatment_detail);
@@ -66,11 +68,9 @@ treatmentDetailsRouter
 
   .put(
     asyncHandler(async (req, res) => {
-      const treatment_detail = await Departments.findByIdAndUpdate(
-        req.params.treatment_detailId,
-        { $set: req.body },
-        { new: true }
-      );
+      const treatment_detail = await prisma.treatment_Detail.update({
+        where: { id: req.params.treatment_detailId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(treatment_detail);
@@ -79,9 +79,9 @@ treatmentDetailsRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const treatment_detail = await Departments.findByIdAndRemove(
-        req.params.treatment_detailId
-      );
+      const treatment_detail = await prisma.treatment_Detail.delete({
+        where: { id: req.params.treatment_detailId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(treatment_detail);

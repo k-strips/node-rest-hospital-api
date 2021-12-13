@@ -17,7 +17,7 @@ medicineRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const medicines = await prisma.medicine.create(req.body);
+      const medicines = await prisma.medicine.createMany(req.body);
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(medicines);
@@ -33,7 +33,7 @@ medicineRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const medicines = await prisma.medicine.remove({});
+      const medicines = await prisma.medicine.delete(req.body);
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(medicines);
@@ -44,7 +44,9 @@ medicineRouter
   .route("/:medicineId")
   .get(
     asyncHandler(async (req, res) => {
-      const medicine = await Departments.findById(req.params.medicineId);
+      const medicine = await prisma.medicine.findUnique({
+        where: { id: req.params.medicineId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(medicine);
@@ -54,31 +56,31 @@ medicineRouter
   .post(
     asyncHandler(async (req, res) => {
       res.statusCode = 403;
-      res.end(`POST operation not supported on /hospital/hospitalId`);
+      res.end(`POST operation not supported on /medicine/medicineId`);
     })
   )
 
   .put(
     asyncHandler(async (req, res) => {
-      const hospital = await Departments.findByIdAndUpdate(
-        req.params.hospitalId,
-        { $set: req.body },
-        { new: true }
-      );
+      const medicine = await prisma.medicine.update({
+        where: { id: req.params.medicineId },
+        data: req.body,
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(medicine);
     })
   )
 
   .delete(
     asyncHandler(async (req, res) => {
-      const hospital = await Departments.findByIdAndRemove(
-        req.params.hospitalId
-      );
+      const medicine = await prisma.medicine.delete({
+        where: { id: req.params.medicineId },
+      });
+
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(medicine);
     })
   );
 

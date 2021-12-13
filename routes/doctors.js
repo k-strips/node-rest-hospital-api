@@ -8,7 +8,7 @@ doctorRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const doctors = await prisma.doctor.findMany(req.body);
+      const doctors = await prisma.doctor.findMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(doctors);
@@ -17,7 +17,7 @@ doctorRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const doctors = await prisma.doctor.create(req.body);
+      const doctors = await prisma.doctor.createMany({ data: req.body });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(doctors);
@@ -33,7 +33,7 @@ doctorRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const doctors = await prisma.doctor.remove({});
+      const doctors = await prisma.doctor.deleteMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(doctors);
@@ -44,7 +44,9 @@ doctorRouter
   .route("/:doctorId")
   .get(
     asyncHandler(async (req, res) => {
-      const doctor = await Departments.findById(req.params.doctorId);
+      const doctor = await prisma.doctor.findUnique({
+        where: { id: req.params.doctorId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(doctor);
@@ -54,31 +56,28 @@ doctorRouter
   .post(
     asyncHandler(async (req, res) => {
       res.statusCode = 403;
-      res.end(`POST operation not supported on /hospital/hospitalId`);
+      res.end(`POST operation not supported on /doctor/doctorId`);
     })
   )
 
   .put(
     asyncHandler(async (req, res) => {
-      const hospital = await Departments.findByIdAndUpdate(
-        req.params.hospitalId,
-        { $set: req.body },
-        { new: true }
-      );
+      const doctor = await prisma.doctor.update({
+        where: { id: req.params.doctorId },
+        data: req.body,
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(doctor);
     })
   )
 
   .delete(
     asyncHandler(async (req, res) => {
-      const hospital = await Departments.findByIdAndRemove(
-        req.params.hospitalId
-      );
+      const doctor = await prisma.doctor.deleteMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(doctor);
     })
   );
 

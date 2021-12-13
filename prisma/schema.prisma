@@ -50,23 +50,25 @@ model Doctor_Schedule {
 }
 
 model Address {
-  id            String   @id @default(cuid())
-  email         String   @db.VarChar(256)
-  phone         String?  @db.VarChar(16)
-  mobile        String?  @db.VarChar(16)
-  office        String?  @db.VarChar(16)
-  region        String?  @db.VarChar(16)
-  city          String?  @db.VarChar(16)
-  town          String?  @db.VarChar(256)
-  postalAddress String?  @db.VarChar
-  createdAt     DateTime @default(now()) @db.Timestamptz
-  updatedAt     DateTime @default(now()) @db.Timestamptz
-  Patient       Patient? @relation(fields: [patientId], references: [id])
-  patientId     String?  @unique
-  Doctor        Doctor?  @relation(fields: [doctorId], references: [id])
-  doctorId      String?  @unique
-  Staff         Staff?   @relation(fields: [staffId], references: [id])
-  staffId       String?  @unique
+  id            String    @id @default(cuid())
+  email         String    @db.VarChar(256)
+  phone         String?   @db.VarChar(16)
+  mobile        String?   @db.VarChar(16)
+  office        String?   @db.VarChar(16)
+  region        String?   @db.VarChar(16)
+  city          String?   @db.VarChar(16)
+  town          String?   @db.VarChar(256)
+  postalAddress String?   @db.VarChar
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+  updatedAt     DateTime  @default(now()) @db.Timestamptz
+  Patient       Patient?  @relation(fields: [patientId], references: [id])
+  patientId     String?   @unique
+  Doctor        Doctor?   @relation(fields: [doctorId], references: [id])
+  doctorId      String?   @unique
+  Staff         Staff?    @relation(fields: [staffId], references: [id])
+  staffId       String?   @unique
+  Hospital      Hospital? @relation(fields: [hospitalId], references: [id])
+  hospitalId    String?   @unique
 }
 
 model Hospital {
@@ -76,6 +78,7 @@ model Hospital {
   staffs       Staff[]
   appointments Appointment[]
   services     Service[]
+  address      Address?
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @default(now()) @db.Timestamptz
 }

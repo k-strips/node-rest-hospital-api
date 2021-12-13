@@ -8,7 +8,7 @@ doctorScheduleRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const schedules = await prisma.schedule.findMany(req.body);
+      const schedules = await prisma.doctor_Schedule.findMany(req.body);
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(schedules);
@@ -17,7 +17,9 @@ doctorScheduleRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const schedules = await prisma.schedule.create(req.body);
+      const schedules = await prisma.doctor_Schedule.createMany({
+        data: req.body,
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(schedules);
@@ -33,7 +35,9 @@ doctorScheduleRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const schedules = await prisma.schedule.remove({});
+      const schedules = await prisma.doctor_Schedule.deleteMany({
+        data: req.body,
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(schedules);
@@ -44,7 +48,9 @@ doctorScheduleRouter
   .route("/:scheduleId")
   .get(
     asyncHandler(async (req, res) => {
-      const schedule = await Departments.findById(req.params.scheduleId);
+      const schedule = await prisma.doctor_Schedule.findUnique({
+        where: { id: req.params.scheduleId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(schedule);
@@ -60,11 +66,10 @@ doctorScheduleRouter
 
   .put(
     asyncHandler(async (req, res) => {
-      const schedule = await Departments.findByIdAndUpdate(
-        req.params.scheduleId,
-        { $set: req.body },
-        { new: true }
-      );
+      const schedule = await prisma.doctor_Schedule.update({
+        where: { id: req.params.scheduleId },
+        data: req.body,
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(schedule);
@@ -73,9 +78,9 @@ doctorScheduleRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const schedule = await Departments.findByIdAndRemove(
-        req.params.scheduleId
-      );
+      const schedule = await prisma.doctor_Schedule.delete({
+        where: { id: req.params.scheduleId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(schedule);

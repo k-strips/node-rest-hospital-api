@@ -8,7 +8,7 @@ appointmentRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const appointments = await prisma.appointment.findMany(req.body);
+      const appointments = await prisma.appointment.findMany();
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(appointments);
@@ -17,7 +17,9 @@ appointmentRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const appointments = await prisma.appointment.create(req.body);
+      const appointments = await prisma.appointment.createMany({
+        data: req.body,
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(appointments);
@@ -33,7 +35,7 @@ appointmentRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const appointments = await prisma.appointment.remove({});
+      const appointments = await prisma.appointment.deleteMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(appointments);
@@ -44,7 +46,9 @@ appointmentRouter
   .route("/:appointmentId")
   .get(
     asyncHandler(async (req, res) => {
-      const appointment = await Departments.findById(req.params.appointmentId);
+      const appointment = await Departments.findUnique({
+        where: { id: req.params.appointmentId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(appointment);
@@ -60,11 +64,10 @@ appointmentRouter
 
   .put(
     asyncHandler(async (req, res) => {
-      const appointment = await Departments.findByIdAndUpdate(
-        req.params.appointmentId,
-        { $set: req.body },
-        { new: true }
-      );
+      const appointment = await Departments.update({
+        where: { id: req.params.appointmentId },
+        data: req.body,
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(appointment);
@@ -73,9 +76,9 @@ appointmentRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const appointment = await Departments.findByIdAndRemove(
-        req.params.appointmentId
-      );
+      const appointment = await Departments.delete({
+        where: { id: req.params.appointmentId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(appointment);
