@@ -11,17 +11,20 @@ datasource db {
 }
 
 model Patient {
-  id          String   @id @default(cuid())
-  firstName   String   @db.VarChar(16)
-  lasName     String   @db.VarChar(16)
-  middleName  String?  @db.VarChar(16)
-  gender      String   @db.Char
-  nationality String?  @db.VarChar(32)
-  address     Address?
-  dob         DateTime @db.Date
-  bloodGroup  String?  @db.Char(2)
-  createdAt   DateTime @default(now()) @db.Timestamptz
-  updatedAt   DateTime @default(now()) @db.Timestamptz
+  id           String        @id @default(cuid())
+  firstName    String        @db.VarChar(16)
+  lastName     String        @db.VarChar(16)
+  middleName   String?       @db.VarChar(16)
+  gender       String        @db.Char
+  nationality  String?       @db.VarChar(32)
+  address      Address?
+  appointments Appointment[]
+  dob          DateTime      @db.Date
+  bloodGroup   String?       @db.Char(2)
+  createdAt    DateTime      @default(now()) @db.Timestamptz
+  updatedAt    DateTime      @default(now()) @db.Timestamptz
+  Hospital     Hospital?     @relation(fields: [hospitalId], references: [id])
+  hospitalId   String?
 }
 
 model Doctor {
@@ -32,21 +35,22 @@ model Doctor {
   gender         String            @db.Char
   address        Address?
   schedule       Doctor_Schedule[]
+  appointments   Appointment[]
   specialization String            @db.VarChar(256)
   createdAt      DateTime          @default(now()) @db.Timestamptz
   updatedAt      DateTime          @default(now()) @db.Timestamptz
-  Hospital       Hospital?         @relation(fields: [hospitalId], references: [id])
+  hospital       Hospital?         @relation(fields: [hospitalId], references: [id])
   hospitalId     String?
 }
 
 model Doctor_Schedule {
-  id        String   @id @default(cuid())
-  startDate DateTime @default(now()) @db.Timestamptz
-  endDate   DateTime @default(now()) @db.Timestamptz
-  createdAt DateTime @default(now()) @db.Timestamptz
-  updatedAt DateTime @default(now()) @db.Timestamptz
-  Doctor    Doctor?  @relation(fields: [doctorId], references: [id])
-  doctorId  String?
+  id            String   @id @default(cuid())
+  startDateTime DateTime @default(now()) @db.Timestamptz
+  endDateTime   DateTime @default(now()) @db.Timestamptz
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @default(now()) @db.Timestamptz
+  doctor        Doctor?  @relation(fields: [doctorId], references: [id])
+  doctorId      String?
 }
 
 model Address {
@@ -55,19 +59,20 @@ model Address {
   phone         String?   @db.VarChar(16)
   mobile        String?   @db.VarChar(16)
   office        String?   @db.VarChar(16)
+  country       String    @db.VarChar(64)
   region        String?   @db.VarChar(16)
   city          String?   @db.VarChar(16)
   town          String?   @db.VarChar(256)
   postalAddress String?   @db.VarChar
   createdAt     DateTime  @default(now()) @db.Timestamptz
   updatedAt     DateTime  @default(now()) @db.Timestamptz
-  Patient       Patient?  @relation(fields: [patientId], references: [id])
+  patient       Patient?  @relation(fields: [patientId], references: [id])
   patientId     String?   @unique
-  Doctor        Doctor?   @relation(fields: [doctorId], references: [id])
+  doctor        Doctor?   @relation(fields: [doctorId], references: [id])
   doctorId      String?   @unique
-  Staff         Staff?    @relation(fields: [staffId], references: [id])
+  staff         Staff?    @relation(fields: [staffId], references: [id])
   staffId       String?   @unique
-  Hospital      Hospital? @relation(fields: [hospitalId], references: [id])
+  hospital      Hospital? @relation(fields: [hospitalId], references: [id])
   hospitalId    String?   @unique
 }
 
@@ -78,17 +83,28 @@ model Hospital {
   staffs       Staff[]
   appointments Appointment[]
   services     Service[]
+  patients     Patient[]
   address      Address?
+  medicines    Medicine[]
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @default(now()) @db.Timestamptz
 }
 
 model Appointment {
-  id         String    @id @default(cuid())
-  createdAt  DateTime  @default(now()) @db.Timestamptz
-  updatedAt  DateTime  @default(now()) @db.Timestamptz
-  Hospital   Hospital? @relation(fields: [hospitalId], references: [id])
-  hospitalId String?
+  id                  String     @id @default(cuid())
+  appointmentDateTime DateTime   @db.Timestamptz
+  createdAt           DateTime   @default(now()) @db.Timestamptz
+  updatedAt           DateTime   @default(now()) @db.Timestamptz
+  hospital            Hospital?  @relation(fields: [hospitalId], references: [id])
+  hospitalId          String?
+  doctor              Doctor?    @relation(fields: [doctorId], references: [id])
+  doctorId            String?
+  patient             Patient?   @relation(fields: [patientId], references: [id])
+  patientId           String?
+  service             Service?   @relation(fields: [serviceId], references: [id])
+  serviceId           String?
+  Treatment           Treatment? @relation(fields: [treatmentId], references: [id])
+  treatmentId         String?    @unique
 }
 
 model Staff {
@@ -101,32 +117,43 @@ model Staff {
   designation String    @db.VarChar(32)
   createdAt   DateTime  @default(now()) @db.Timestamptz
   updatedAt   DateTime  @default(now()) @db.Timestamptz
-  Hospital    Hospital? @relation(fields: [hospitalId], references: [id])
+  hospital    Hospital? @relation(fields: [hospitalId], references: [id])
   hospitalId  String?
 }
 
 model Service {
-  id         String    @id @default(cuid())
-  createdAt  DateTime  @default(now()) @db.Timestamptz
-  updatedAt  DateTime  @default(now()) @db.Timestamptz
-  Hospital   Hospital? @relation(fields: [hospitalId], references: [id])
-  hospitalId String?
+  id           String        @id @default(cuid())
+  serviceName  String        @db.VarChar(124)
+  serviceFee   Float         @default(0.00)
+  description  String        @db.VarChar(512)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now()) @db.Timestamptz
+  updatedAt    DateTime      @default(now()) @db.Timestamptz
+  hospital     Hospital?     @relation(fields: [hospitalId], references: [id])
+  hospitalId   String?
 }
 
 model Medicine {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz
-  updatedAt DateTime @default(now()) @db.Timestamptz
+  id                 String            @id @default(cuid())
+  createdAt          DateTime          @default(now()) @db.Timestamptz
+  updatedAt          DateTime          @default(now()) @db.Timestamptz
+  hospital           Hospital?         @relation(fields: [hospitalId], references: [id])
+  hospitalId         String?
+  treatment_Detail   Treatment_Detail? @relation(fields: [treatment_DetailId], references: [id])
+  treatment_DetailId String?
 }
 
 model Treatment {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz
-  updatedAt DateTime @default(now()) @db.Timestamptz
+  id          String       @id @default(cuid())
+  appointment Appointment?
+  remarks     String       @db.VarChar(512)
+  createdAt   DateTime     @default(now()) @db.Timestamptz
+  updatedAt   DateTime     @default(now()) @db.Timestamptz
 }
 
 model Treatment_Detail {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz
-  updatedAt DateTime @default(now()) @db.Timestamptz
+  id        String     @id @default(cuid())
+  medicines Medicine[]
+  createdAt DateTime   @default(now()) @db.Timestamptz
+  updatedAt DateTime   @default(now()) @db.Timestamptz
 }

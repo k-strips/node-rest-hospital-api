@@ -8,7 +8,7 @@ treatmentRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const treatments = await prisma.treatment.findMany(req.body);
+      const treatments = await prisma.treatment.findMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(treatments);
@@ -17,7 +17,13 @@ treatmentRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const treatments = await prisma.treatment.createMany(req.body);
+      const { appointmentId, remarks } = req.body;
+      const treatments = await prisma.treatment.create({
+        data: {
+          remarks,
+          appointment: { connect: { id: appointmentId } },
+        },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(treatments);
@@ -33,7 +39,7 @@ treatmentRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const treatments = await prisma.treatment.delete(req.body);
+      const treatments = await prisma.treatment.deleteMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(treatments);
@@ -62,9 +68,13 @@ treatmentRouter
 
   .put(
     asyncHandler(async (req, res) => {
+      const { appointmentId, remarks } = req.body;
       const treatment = await prisma.treatment.update({
         where: { id: req.params.treatmentId },
-        data: req.body,
+        data: {
+          remarks,
+          appointment: { connect: { id: appointmentId } },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");

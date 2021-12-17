@@ -8,7 +8,7 @@ staffRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const staffs = await prisma.staff.findMany(req.body);
+      const staffs = await prisma.staff.findMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(staffs);
@@ -17,7 +17,52 @@ staffRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const staffs = await prisma.staff.createMany(req.body);
+      const {
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        nationality,
+        dob,
+        bloodGroup,
+        mobile,
+        phone,
+        hospitalId,
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+      } = req.body;
+
+      const address = {
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+        mobile,
+        phone,
+      };
+      const staffs = await prisma.staff.create({
+        data: {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          middleName: middleName.trim(),
+          gender,
+          nationality,
+          dob,
+          bloodGroup,
+          address: {
+            create: {
+              ...address,
+            },
+          },
+          hospital: {
+            connect: { id: hospitalId },
+          },
+        },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(staffs);
@@ -62,9 +107,50 @@ staffRouter
 
   .put(
     asyncHandler(async (req, res) => {
+      const {
+        id,
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        nationality,
+        dob,
+        bloodGroup,
+        mobile,
+        phone,
+        hospitalId,
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+      } = req.body;
+
+      const address = {
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+        mobile,
+        phone,
+      };
       const staff = await prisma.staff.update({
         where: { id: req.params.staffId },
-        data: req.body,
+        data: {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          middleName: middleName.trim(),
+          gender,
+          nationality,
+          dob,
+          bloodGroup,
+          address: {
+            update: {
+              ...address,
+            },
+          },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");

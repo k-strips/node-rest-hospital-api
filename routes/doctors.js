@@ -8,7 +8,7 @@ doctorRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const doctors = await prisma.doctor.findMany({});
+      const doctors = await prisma.doctor.findMany();
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(doctors);
@@ -17,7 +17,30 @@ doctorRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const doctors = await prisma.doctor.createMany({ data: req.body });
+      const {
+        firstName,
+        lastName,
+        middleName,
+        specialization,
+        gender,
+        hospitalId,
+        email,
+        phone,
+      } = req.body;
+      const address = { email, phone };
+      const doctors = await prisma.doctor.create({
+        data: {
+          firstName: firstName?.trim(),
+          lastName: lastName?.trim(),
+          middleName: middleName?.trim(),
+          specialization,
+          gender,
+          hospital: {
+            connect: { id: hospitalId },
+          },
+          address: { create: { ...address } },
+        },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(doctors);
@@ -62,9 +85,27 @@ doctorRouter
 
   .put(
     asyncHandler(async (req, res) => {
+      const {
+        firstName,
+        lastName,
+        middleName,
+        specialization,
+        gender,
+        hospitalId,
+        email,
+        phone,
+      } = req.body;
+      const address = { email, phone };
       const doctor = await prisma.doctor.update({
         where: { id: req.params.doctorId },
-        data: req.body,
+        data: {
+          firstName: firstName?.trim(),
+          lastName: lastName?.trim(),
+          middleName: middleName?.trim(),
+          specialization,
+          gender,
+          address: { update: { ...address } },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -74,7 +115,9 @@ doctorRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const doctor = await prisma.doctor.deleteMany({});
+      const doctor = await prisma.doctor.delete({
+        where: { id: req.params.doctorId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(doctor);

@@ -8,7 +8,7 @@ patientRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const patients = await prisma.patient.findMany(req.body);
+      const patients = await prisma.patient.findMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(patients);
@@ -17,7 +17,52 @@ patientRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const patients = await prisma.patient.createMany(req.body);
+      const {
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        nationality,
+        dob,
+        bloodGroup,
+        mobile,
+        phone,
+        hospitalId,
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+      } = req.body;
+
+      const address = {
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+        mobile,
+        phone,
+      };
+      const patients = await prisma.patient.create({
+        data: {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          middleName: middleName.trim(),
+          gender,
+          nationality,
+          dob,
+          bloodGroup,
+          address: {
+            create: {
+              ...address,
+            },
+          },
+          hospital: {
+            connect: { id: hospitalId },
+          },
+        },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(patients);
@@ -33,7 +78,7 @@ patientRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const patients = await prisma.patient.deleteMany(req.body);
+      const patients = await prisma.patient.deleteMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(patients);
@@ -62,9 +107,52 @@ patientRouter
 
   .put(
     asyncHandler(async (req, res) => {
+      const {
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        nationality,
+        dob,
+        bloodGroup,
+        mobile,
+        phone,
+        hospitalId,
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+      } = req.body;
+
+      const address = {
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+        mobile,
+        phone,
+      };
       const patient = await prisma.patient.update({
         where: { id: req.params.patientId },
-        data: req.body,
+        data: {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          middleName: middleName.trim(),
+          gender,
+          nationality,
+          dob,
+          bloodGroup,
+          address: {
+            update: {
+              ...address,
+            },
+          },
+          hospital: {
+            connect: { id: hospitalId },
+          },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -74,7 +162,9 @@ patientRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const patient = await prisma.patient.deleteMany({});
+      const patient = await prisma.patient.delete({
+        where: { id: req.params.patientId },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(patient);

@@ -17,8 +17,20 @@ appointmentRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const appointments = await prisma.appointment.createMany({
-        data: req.body,
+      const { doctorId, hospitalId, serviceId, appointmentDateTime } = req.body;
+      const appointments = await prisma.appointment.create({
+        data: {
+          appointmentDateTime,
+          hospital: {
+            connect: { id: hospitalId },
+          },
+          doctor: {
+            connect: doctorId,
+          },
+          service: {
+            connect: { id: serviceId },
+          },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -46,7 +58,7 @@ appointmentRouter
   .route("/:appointmentId")
   .get(
     asyncHandler(async (req, res) => {
-      const appointment = await Departments.findUnique({
+      const appointment = await prisma.appointment.findUnique({
         where: { id: req.params.appointmentId },
       });
       res.statusCode = 200;
@@ -64,9 +76,15 @@ appointmentRouter
 
   .put(
     asyncHandler(async (req, res) => {
-      const appointment = await Departments.update({
+      const { doctorId, hospitalId, serviceId, appointmentDateTime } = req.body;
+      const appointment = await prisma.appointment.update({
         where: { id: req.params.appointmentId },
-        data: req.body,
+        data: {
+          appointmentDateTime,
+          service: {
+            connect: { id: serviceId },
+          },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -76,7 +94,7 @@ appointmentRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const appointment = await Departments.delete({
+      const appointment = await prisma.appointment.delete({
         where: { id: req.params.appointmentId },
       });
       res.statusCode = 200;

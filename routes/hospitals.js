@@ -9,7 +9,7 @@ hospitalRouter
   .get(
     asyncHandler(async (req, res) => {
       const hospitals = await prisma.hospital.findMany({
-        include: { staffs: true, doctors: true, _count: true },
+        include: { _count: true, address: true },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -19,21 +19,38 @@ hospitalRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      console.log(req);
-      const hospitals = await prisma.hospital.createMany({
+      const {
+        email,
+        name,
+        mobile,
+        region,
+        city,
+        town,
+        postalAddress,
+        country,
+      } = req.body;
+      let address = {
+        email: email.trim(),
+        mobile,
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+      };
+      const hospital = await prisma.hospital.create({
         data: {
-          name: req.params.name,
+          name,
           address: {
             create: {
-              email: req.body.email,
-              office: req.body.office,
+              ...address,
             },
           },
         },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospitals);
+      res.json(hospital);
     })
   )
 
@@ -59,6 +76,7 @@ hospitalRouter
     asyncHandler(async (req, res) => {
       const hospital = await prisma.hospital.findUnique({
         where: { id: req.params.hospitalId },
+        include: { services: true },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -75,9 +93,35 @@ hospitalRouter
 
   .put(
     asyncHandler(async (req, res) => {
+      const {
+        email,
+        name,
+        mobile,
+        region,
+        city,
+        town,
+        postalAddress,
+        country,
+      } = req.body;
+      let address = {
+        email: email.trim(),
+        mobile,
+        country,
+        region,
+        city,
+        town,
+        postalAddress,
+      };
       const hospital = await prisma.hospital.update({
         where: { id: req.params.hospitalId },
-        data: req.body,
+        data: {
+          name,
+          address: {
+            create: {
+              ...address,
+            },
+          },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -119,6 +163,8 @@ hospitalRouter
 
   .put(
     asyncHandler(async (req, res) => {
+      const { firstName, lastName, middleName, gender, designation } =
+        req.params.body;
       const hospital = await prisma.hospital.update({
         where: { id: req.params.hospitalId },
         data: {

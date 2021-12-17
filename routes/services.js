@@ -8,7 +8,7 @@ serviceRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const services = await prisma.service.findMany(req.body);
+      const services = await prisma.service.findMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(services);
@@ -17,7 +17,15 @@ serviceRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const services = await prisma.service.createMany(req.body);
+      const { hospitalId, serviceFee, serviceName, description } = req.body;
+      const services = await prisma.service.create({
+        data: {
+          serviceName,
+          serviceFee,
+          description,
+          hospital: { connect: { id: hospitalId } },
+        },
+      });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(services);
@@ -33,7 +41,7 @@ serviceRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const services = await prisma.service.deleteMany(req.body);
+      const services = await prisma.service.deleteMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(services);
@@ -62,9 +70,14 @@ serviceRouter
 
   .put(
     asyncHandler(async (req, res) => {
+      const { serviceId, serviceFee, serviceName, description } = req.body;
       const service = await prisma.service.update({
-        where: { id: req.params.serviceId },
-        data: req.body,
+        where: { id: serviceId },
+        data: {
+          serviceName,
+          serviceFee,
+          description,
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");

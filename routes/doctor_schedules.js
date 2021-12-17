@@ -8,7 +8,7 @@ doctorScheduleRouter
   .route("/")
   .get(
     asyncHandler(async (req, res) => {
-      const schedules = await prisma.doctor_Schedule.findMany(req.body);
+      const schedules = await prisma.doctor_Schedule.findMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(schedules);
@@ -17,8 +17,13 @@ doctorScheduleRouter
 
   .post(
     asyncHandler(async (req, res) => {
-      const schedules = await prisma.doctor_Schedule.createMany({
-        data: req.body,
+      const { startDateTime, endDateTime, doctorId } = req.body;
+      const schedules = await prisma.doctor_Schedule.create({
+        data: {
+          startDateTime,
+          endDateTime,
+          doctor: { connect: { id: doctorId } },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -35,9 +40,7 @@ doctorScheduleRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const schedules = await prisma.doctor_Schedule.deleteMany({
-        data: req.body,
-      });
+      const schedules = await prisma.doctor_Schedule.deleteMany({});
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(schedules);
@@ -66,9 +69,14 @@ doctorScheduleRouter
 
   .put(
     asyncHandler(async (req, res) => {
+      const { startDateTime, endDateTime } = req.body;
+
       const schedule = await prisma.doctor_Schedule.update({
         where: { id: req.params.scheduleId },
-        data: req.body,
+        data: {
+          startDateTime,
+          endDateTime,
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
