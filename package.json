@@ -24,6 +24,9 @@
   "directories": {
     "lib": "lib"
   },
+  "engines": {
+    "node": "16.x"
+  },
   "keywords": [
     "node",
     "express",

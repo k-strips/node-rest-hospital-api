@@ -144,13 +144,14 @@ hospitalRouter
   .route("/:hospitalId/staffs")
   .get(
     asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.findUnique({
-        where: { id: req.params.hospitalId },
-        include: { staffs: true },
-      });
+      const staffs = await prisma.hospital
+        .findUnique({
+          where: { id: req.params.hospitalId },
+        })
+        .staffs();
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(staffs);
     })
   )
 
@@ -163,62 +164,38 @@ hospitalRouter
 
   .put(
     asyncHandler(async (req, res) => {
-      const { firstName, lastName, middleName, gender, designation } =
-        req.params.body;
+      const {
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        designation,
+        nationality,
+        email,
+        mobile,
+        city,
+        town,
+      } = req.params.body;
       const hospital = await prisma.hospital.update({
         where: { id: req.params.hospitalId },
         data: {
           staffs: {
-            create: req.body,
-          },
-        },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  )
-
-  .delete(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.update({
-        where: { id: req.params.hospitalId },
-        data: { staffs: { deleteMany: {} } },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  );
-
-hospitalRouter
-  .route("/:hospitalId/staffs/:staffId")
-  .get(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.findUnique({
-        where: { id: req.params.hospitalId },
-        include: { staffs: true },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  )
-
-  .post(
-    asyncHandler(async (req, res) => {
-      res.statusCode = 403;
-      res.end(`POST operation not supported on /hospital/hospitalId`);
-    })
-  )
-
-  .put(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.update({
-        where: { id: req.params.hospitalId },
-        data: {
-          staffs: {
-            create: req.body,
+            create: {
+              firstName,
+              lastName,
+              middleName,
+              gender,
+              designation,
+              nationality,
+              address: {
+                create: {
+                  email,
+                  mobile,
+                  city,
+                  town,
+                },
+              },
+            },
           },
         },
       });
@@ -244,13 +221,14 @@ hospitalRouter
   .route("/:hospitalId/doctors")
   .get(
     asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.findUnique({
-        where: { id: req.params.hospitalId },
-        include: { staffs: true },
-      });
+      const doctors = await prisma.hospital
+        .findUnique({
+          where: { id: req.params.hospitalId },
+        })
+        .doctors();
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(doctors);
     })
   )
 
@@ -281,56 +259,7 @@ hospitalRouter
     asyncHandler(async (req, res) => {
       const hospital = await prisma.hospital.update({
         where: { id: req.params.hospitalId },
-        data: { staffs: { deleteMany: {} } },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  );
-
-hospitalRouter
-  .route("/:hospitalId/doctors/:doctorId")
-  .get(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.findUnique({
-        where: { id: req.params.hospitalId },
-        include: { staffs: true },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  )
-
-  .post(
-    asyncHandler(async (req, res) => {
-      res.statusCode = 403;
-      res.end(`POST operation not supported on /hospital/hospitalId`);
-    })
-  )
-
-  .put(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.update({
-        where: { id: req.params.hospitalId },
-        data: {
-          staffs: {
-            create: req.body,
-          },
-        },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  )
-
-  .delete(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.update({
-        where: { id: req.params.hospitalId },
-        data: { staffs: { deleteMany: {} } },
+        data: { doctors: { deleteMany: {} } },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
@@ -342,13 +271,14 @@ hospitalRouter
   .route("/:hospitalId/services")
   .get(
     asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.findUnique({
-        where: { id: req.params.hospitalId },
-        include: { services: true },
-      });
+      const services = await prisma.hospital
+        .findUnique({
+          where: { id: req.params.hospitalId },
+        })
+        .services();
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(services);
     })
   )
 
@@ -388,65 +318,17 @@ hospitalRouter
   );
 
 hospitalRouter
-  .route("/:hospitalId/services/:serviceId")
-  .get(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.findUnique({
-        where: { id: req.params.hospitalId },
-        include: { staffs: true },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  )
-
-  .post(
-    asyncHandler(async (req, res) => {
-      res.statusCode = 403;
-      res.end(`POST operation not supported on /hospital/hospitalId`);
-    })
-  )
-
-  .put(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.update({
-        where: { id: req.params.hospitalId },
-        data: {
-          staffs: {
-            create: req.body,
-          },
-        },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  )
-
-  .delete(
-    asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.update({
-        where: { id: req.params.hospitalId },
-        data: { staffs: { deleteMany: {} } },
-      });
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
-    })
-  );
-
-hospitalRouter
   .route("/:hospitalId/appointments")
   .get(
     asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.findUnique({
-        where: { id: req.params.hospitalId },
-        include: { appointments: true },
-      });
+      const appointments = await prisma.hospital
+        .findUnique({
+          where: { id: req.params.hospitalId },
+        })
+        .appointments();
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(appointments);
     })
   )
 
@@ -475,27 +357,28 @@ hospitalRouter
 
   .delete(
     asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.update({
+      const appointments = await prisma.hospital.update({
         where: { id: req.params.hospitalId },
         data: { appointments: { deleteMany: {} } },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(appointments);
     })
   );
 
 hospitalRouter
-  .route("/:hospitalId/appointments/:appointmentId")
+  .route("/:hospitalId/patients")
   .get(
     asyncHandler(async (req, res) => {
-      const hospital = await prisma.hospital.findUnique({
-        where: { id: req.params.hospitalId },
-        include: { staffs: true },
-      });
+      const patients = await prisma.hospital
+        .findUnique({
+          where: { id: req.params.hospitalId },
+        })
+        .patients();
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json(hospital);
+      res.json(patients);
     })
   )
 
@@ -511,7 +394,7 @@ hospitalRouter
       const hospital = await prisma.hospital.update({
         where: { id: req.params.hospitalId },
         data: {
-          staffs: {
+          appointments: {
             create: req.body,
           },
         },
@@ -524,13 +407,163 @@ hospitalRouter
 
   .delete(
     asyncHandler(async (req, res) => {
+      const patients = await prisma.hospital.update({
+        where: { id: req.params.hospitalId },
+        data: { patients: { deleteMany: {} } },
+      });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(patients);
+    })
+  );
+
+hospitalRouter
+  .route("/:hospitalId/medicines")
+  .get(
+    asyncHandler(async (req, res) => {
+      const medicines = await prisma.hospital
+        .findUnique({
+          where: { id: req.params.hospitalId },
+        })
+        .medicines();
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(medicines);
+    })
+  )
+
+  .post(
+    asyncHandler(async (req, res) => {
+      res.statusCode = 403;
+      res.end(`POST operation not supported on /hospital/hospitalId`);
+    })
+  )
+
+  .put(
+    asyncHandler(async (req, res) => {
       const hospital = await prisma.hospital.update({
         where: { id: req.params.hospitalId },
-        data: { staffs: { deleteMany: {} } },
+        data: {
+          appointments: {
+            create: req.body,
+          },
+        },
       });
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       res.json(hospital);
+    })
+  )
+
+  .delete(
+    asyncHandler(async (req, res) => {
+      const medicines = await prisma.hospital.update({
+        where: { id: req.params.hospitalId },
+        data: { medicines: { deleteMany: {} } },
+      });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(medicines);
+    })
+  );
+
+hospitalRouter
+  .route("/:hospitalId/treatments")
+  .get(
+    asyncHandler(async (req, res) => {
+      const treatments = await prisma.hospital
+        .findUnique({
+          where: { id: req.params.hospitalId },
+        })
+        .treatments();
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(treatments);
+    })
+  )
+
+  .post(
+    asyncHandler(async (req, res) => {
+      res.statusCode = 403;
+      res.end(`POST operation not supported on /hospital/hospitalId`);
+    })
+  )
+
+  .put(
+    asyncHandler(async (req, res) => {
+      const hospital = await prisma.hospital.update({
+        where: { id: req.params.hospitalId },
+        data: {
+          appointments: {
+            create: req.body,
+          },
+        },
+      });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(hospital);
+    })
+  )
+
+  .delete(
+    asyncHandler(async (req, res) => {
+      const treatments = await prisma.hospital.update({
+        where: { id: req.params.hospitalId },
+        data: { treatments: { deleteMany: {} } },
+      });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(treatments);
+    })
+  );
+
+hospitalRouter
+  .route("/:hospitalId/treatment_details")
+  .get(
+    asyncHandler(async (req, res) => {
+      const treatment_detais = await prisma.hospital
+        .findUnique({
+          where: { id: req.params.hospitalId },
+        })
+        .treatment_detais();
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(treatment_detais);
+    })
+  )
+
+  .post(
+    asyncHandler(async (req, res) => {
+      res.statusCode = 403;
+      res.end(`POST operation not supported on /hospital/hospitalId`);
+    })
+  )
+
+  .put(
+    asyncHandler(async (req, res) => {
+      const hospital = await prisma.hospital.update({
+        where: { id: req.params.hospitalId },
+        data: {
+          appointments: {
+            create: req.body,
+          },
+        },
+      });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(hospital);
+    })
+  )
+
+  .delete(
+    asyncHandler(async (req, res) => {
+      const treatment_detais = await prisma.hospital.update({
+        where: { id: req.params.hospitalId },
+        data: { treatment_detais: { deleteMany: {} } },
+      });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(treatment_detais);
     })
   );
 

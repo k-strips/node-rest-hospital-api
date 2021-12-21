@@ -30,7 +30,7 @@ model Patient {
 model Doctor {
   id             String            @id @default(cuid())
   firstName      String            @db.VarChar(16)
-  lasName        String            @db.VarChar(16)
+  lastName       String            @db.VarChar(16)
   middleName     String?           @db.VarChar(16)
   gender         String            @db.Char
   address        Address?
@@ -110,8 +110,9 @@ model Appointment {
 model Staff {
   id          String    @id @default(cuid())
   firstName   String    @db.VarChar(16)
-  lasName     String    @db.VarChar(16)
+  lastName    String    @db.VarChar(16)
   middleName  String?   @db.VarChar(16)
+  nationality String?   @db.VarChar(32)
   address     Address?
   gender      String    @db.Char
   designation String    @db.VarChar(32)
